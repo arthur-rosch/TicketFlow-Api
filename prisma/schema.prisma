@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password_hash String
+  name          String
+  whatsapp      String
+  Ticket        Ticket[]
+}
+
+enum Category {
+  MUSIC
+  SPORTS
+  COMEDY
+  OTHER
+}
+
+model Show {
+  id          String   @id @default(uuid())
+  name        String
+  image       String?
+  description String
+  openingDate DateTime
+  showDay     DateTime
+
+  category Category
+  tickets  Ticket[]
+}
+
+enum TicketType {
+  PISTA
+  VIP
+  BACKSTAGE
+}
+
+model Ticket {
+  id         String     @id @default(uuid())
+  price      Float
+  qrCode     String
+  type       TicketType
+  validUntil DateTime
+
+  showId String
+  show   Show   @relation(fields: [showId], references: [id])
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+}
